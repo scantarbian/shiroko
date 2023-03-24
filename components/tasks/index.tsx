@@ -6,7 +6,7 @@ const TasksView = ({ className }: Props) => {
   return (
     <div className={className}>
       <div className="flex justify-between items-center">
-        <h2 className="text-lg font-semibold">Your Tasks</h2>
+        <h2 className="text-lg font-semibold pb-2">Your Tasks</h2>
         <span>Sort by</span>
       </div>
 
