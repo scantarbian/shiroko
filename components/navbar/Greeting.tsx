@@ -16,7 +16,7 @@ const Greeting = () => {
 
   return (
     <>
-      <h1 className="text-lg font-semibold">{`${generateGreeting(
+      <h1 className="text-xl font-bold">{`${generateGreeting(
         date
       )}! David 👋`}</h1>
     </>

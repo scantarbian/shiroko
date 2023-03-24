@@ -1,8 +1,19 @@
-const TasksView = () => {
+type Props = {
+  className?: string;
+};
+
+const TasksView = ({ className }: Props) => {
   return (
-    <>
-      <h2>Here are your tasks:</h2>
-    </>
+    <div className={className}>
+      <div className="flex justify-between items-center">
+        <h2 className="text-lg font-semibold">Your Tasks</h2>
+        <span>Sort by</span>
+      </div>
+
+      <div className="border rounded-lg flex flex-col">
+        <span>Y</span>
+      </div>
+    </div>
   );
 };
 
