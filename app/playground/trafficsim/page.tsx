@@ -15,6 +15,9 @@ import { useEffect, useState } from "react";
 // use string matching if match not found (close approximation)
 // 1 traffic cycle: vehicle go from origin to destination and back
 // 1 tick = 1 minute? 1440 tick/day
+// on each tick:
+// - vehicle move to next node based on djikstra algorithm on distance and traffic graph
+// - traffic graph update based on vehicle position
 
 type Vehicle = {
   origin: number;
@@ -29,7 +32,7 @@ type NodeInformation = {
 };
 
 const TrafficSim = () => {
-  const [nodes, setNodes] = useState(5);
+  const [nodes, setNodes] = useState(8);
   const [distanceGraph, setDistanceGraph] = useState<number[][]>([[]]);
   const [trafficGraph, setTrafficGraph] = useState<number[][]>([[]]);
   const [nodeInformation, setNodeInformation] = useState<NodeInformation[]>([]);
@@ -144,7 +147,7 @@ const TrafficSim = () => {
       <div className="flex space-x-4">
         <div className="flex flex-col items-center">
           <span>Distance Graph</span>
-          <div className="grid grid-cols-6">
+          <div className="grid grid-cols-9">
             <span></span>
             {distanceGraph.map((col, j) => {
               return (
@@ -180,7 +183,7 @@ const TrafficSim = () => {
         </div>
         <div className="flex flex-col items-center">
           <span>Traffic Graph</span>
-          <div className="grid grid-cols-6">
+          <div className="grid grid-cols-9">
             <span></span>
             {trafficGraph.map((col, j) => {
               return (
