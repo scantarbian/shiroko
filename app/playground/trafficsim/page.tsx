@@ -16,10 +16,25 @@ import { useEffect, useState } from "react";
 // 1 traffic cycle: vehicle go from origin to destination and back
 // 1 tick = 1 minute? 1440 tick/day
 
+type Vehicle = {
+  origin: number;
+  destination: number;
+};
+
+type NodeInformation = {
+  key: number;
+  name: string;
+  status: "origin" | "destination";
+};
+
 const TrafficSim = () => {
   const [nodes, setNodes] = useState(5);
   const [distanceGraph, setDistanceGraph] = useState<number[][]>([[]]);
   const [trafficGraph, setTrafficGraph] = useState<number[][]>([[]]);
+  const [nodeInformation, setNodeInformation] = useState<NodeInformation[]>([]);
+  const [vehicles, setVehicles] = useState<Vehicle[]>([]);
+  const [tick, setTick] = useState(0);
+  const [isSimulationActive, setIsSimulationActive] = useState(false);
 
   const initDistanceGraph = (nodes: number) => {
     // fill graph with values between 0 and 10
@@ -49,16 +64,41 @@ const TrafficSim = () => {
     setTrafficGraph(graphArray);
   };
 
+  const initNodeInformation = (nodes: number) => {
+    const originChance = 0.5;
+
+    const nodeInformationArray: NodeInformation[] = Array.from(
+      { length: nodes },
+      (_, i) => {
+        const name = String.fromCharCode(65 + i);
+        const status = Math.random() < originChance ? "origin" : "destination";
+
+        return {
+          key: i,
+          name,
+          status,
+        };
+      }
+    );
+
+    setNodeInformation(nodeInformationArray);
+  };
+
   useEffect(() => {
     initDistanceGraph(nodes);
     initTrafficGraph(nodes);
+    initNodeInformation(nodes);
   }, []);
+
+  const toggleSimulation = () => {
+    setIsSimulationActive(!isSimulationActive);
+  };
 
   return (
     <main>
       <div className="flex space-x-4">
         <div className="flex flex-col items-center">
-          <h1>Distance Graph</h1>
+          <span>Distance Graph</span>
           <div className="grid grid-cols-6">
             <span></span>
             {distanceGraph.map((col, j) => {
@@ -85,9 +125,16 @@ const TrafficSim = () => {
               );
             })}
           </div>
+          <div>
+            <span>Legend</span>
+            <ol className="list-disc">
+              <li>0 = Same Origin</li>
+              <li>{`>0 = Distance`}</li>
+            </ol>
+          </div>
         </div>
         <div className="flex flex-col items-center">
-          <h1>Traffic Graph</h1>
+          <span>Traffic Graph</span>
           <div className="grid grid-cols-6">
             <span></span>
             {trafficGraph.map((col, j) => {
@@ -114,6 +161,39 @@ const TrafficSim = () => {
               );
             })}
           </div>
+          <div>
+            <span>Legend</span>
+            <ol className="list-disc">
+              <li>-1 = Same Origin</li>
+              <li>0 = No traffic</li>
+              <li>{`>0 = Traffic amount`}</li>
+            </ol>
+          </div>
+        </div>
+        <div className="flex flex-col items-center">
+          <span>Nodes Information</span>
+          <div className="grid grid-cols-3">
+            {nodeInformation.map((node) => {
+              return (
+                <>
+                  <span key={`${node.key}-name`}>{node.name}</span>
+                  <span key={`${node.key}-key`}>{node.key}</span>
+                  <span key={`${node.key}-status`}>{node.status}</span>
+                </>
+              );
+            })}
+          </div>
+        </div>
+        <div className="flex flex-col items-center">
+          <span>Vehicles Information</span>
+        </div>
+        <div className="flex flex-col items-center">
+          <span>Simulation Data</span>
+          <span>Nodes: {nodes}</span>
+          <span>Tick: {tick}</span>
+          <button className="py-1 px-4 border-2" onClick={toggleSimulation}>
+            <span>{isSimulationActive ? "Start" : "Stop"}</span>
+          </button>
         </div>
       </div>
     </main>
