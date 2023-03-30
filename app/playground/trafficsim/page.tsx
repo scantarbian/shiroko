@@ -19,6 +19,7 @@ import { useEffect, useState } from "react";
 type Vehicle = {
   origin: number;
   destination: number;
+  position: number;
 };
 
 type NodeInformation = {
@@ -84,11 +85,55 @@ const TrafficSim = () => {
     setNodeInformation(nodeInformationArray);
   };
 
+  const initVehicles = (amount: number) => {
+    // vehicle spawn at origin nodes and go to destination nodes
+    const originNodes = nodeInformation.filter(
+      (node) => node.status === "origin"
+    );
+
+    const destinationNodes = nodeInformation.filter(
+      (node) => node.status === "destination"
+    );
+
+    const vehicleArray: Vehicle[] = Array.from({ length: amount }, () => {
+      const origin =
+        originNodes[Math.floor(Math.random() * originNodes.length)].key;
+      const destination =
+        destinationNodes[Math.floor(Math.random() * destinationNodes.length)]
+          .key;
+      const position = origin;
+
+      return {
+        origin,
+        destination,
+        position,
+      };
+    });
+
+    setVehicles(vehicleArray);
+  };
+
   useEffect(() => {
     initDistanceGraph(nodes);
     initTrafficGraph(nodes);
     initNodeInformation(nodes);
   }, []);
+
+  useEffect(() => {
+    if (nodeInformation.length > 0) {
+      initVehicles(10);
+    }
+  }, [nodeInformation]);
+
+  useEffect(() => {
+    if (isSimulationActive) {
+      const interval = setInterval(() => {
+        setTick((tick) => tick + 1);
+      }, 1000);
+
+      return () => clearInterval(interval);
+    }
+  }, [isSimulationActive]);
 
   const toggleSimulation = () => {
     setIsSimulationActive(!isSimulationActive);
@@ -173,6 +218,9 @@ const TrafficSim = () => {
         <div className="flex flex-col items-center">
           <span>Nodes Information</span>
           <div className="grid grid-cols-3">
+            <span className="font-bold">NAME</span>
+            <span className="font-bold">ID</span>
+            <span className="font-bold">STATUS</span>
             {nodeInformation.map((node) => {
               return (
                 <>
@@ -186,13 +234,30 @@ const TrafficSim = () => {
         </div>
         <div className="flex flex-col items-center">
           <span>Vehicles Information</span>
+          <div className="grid grid-cols-4">
+            <span className="font-bold">ID</span>
+            <span className="font-bold">ORIG</span>
+            <span className="font-bold">DEST</span>
+            <span className="font-bold">CUR POS</span>
+            {vehicles.map((vehicle, i) => {
+              return (
+                <>
+                  <span key={`${i}-i`}>#V{i}</span>
+                  <span key={`${i}-origin`}>{vehicle.origin}</span>
+                  <span key={`${i}-destination`}>{vehicle.destination}</span>
+                  <span key={`${i}-position`}>{vehicle.position}</span>
+                </>
+              );
+            })}
+          </div>
         </div>
         <div className="flex flex-col items-center">
           <span>Simulation Data</span>
           <span>Nodes: {nodes}</span>
           <span>Tick: {tick}</span>
+          <span>Vehicles: {vehicles.length}</span>
           <button className="py-1 px-4 border-2" onClick={toggleSimulation}>
-            <span>{isSimulationActive ? "Start" : "Stop"}</span>
+            <span>{isSimulationActive ? "Stop" : "Start"}</span>
           </button>
         </div>
       </div>
