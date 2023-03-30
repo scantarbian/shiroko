@@ -23,6 +23,7 @@ type Vehicle = {
   origin: number;
   destination: number;
   position: number;
+  path: number[];
 };
 
 type NodeInformation = {
@@ -30,6 +31,8 @@ type NodeInformation = {
   name: string;
   status: "origin" | "destination";
 };
+
+type Djikstra = (origin: number, destination: number) => number[];
 
 const TrafficSim = () => {
   const [nodes, setNodes] = useState(8);
@@ -110,6 +113,7 @@ const TrafficSim = () => {
         origin,
         destination,
         position,
+        path: [],
       };
     });
 
@@ -249,6 +253,9 @@ const TrafficSim = () => {
                   <span key={`${i}-origin`}>{vehicle.origin}</span>
                   <span key={`${i}-destination`}>{vehicle.destination}</span>
                   <span key={`${i}-position`}>{vehicle.position}</span>
+                  <span key={`${i}-path`} className="col-span-4">
+                    PATH: {vehicle.path}
+                  </span>
                 </>
               );
             })}
