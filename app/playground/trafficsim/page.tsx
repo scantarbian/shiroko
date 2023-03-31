@@ -245,77 +245,79 @@ const TrafficSim = () => {
   return (
     <main>
       <div className="flex space-x-4">
-        <div className="flex flex-col items-center">
-          <span>Distance Graph</span>
-          <div className="grid grid-cols-9">
-            <span></span>
-            {distanceGraph.map((col, j) => {
-              return (
-                <span className="font-bold border-b-2 p-2" key={j}>
-                  {j}
-                </span>
-              );
-            })}
-            {distanceGraph.map((row, i) => {
-              return (
-                <>
-                  <span className="font-bold border-r-2 p-2" key={i}>
-                    {i}
+        <div className="flex flex-col items-center space-y-2">
+          <div className="flex flex-col items-center">
+            <span className="font-bold">Distance Graph</span>
+            <div className="grid grid-cols-9">
+              <span></span>
+              {distanceGraph.map((col, j) => {
+                return (
+                  <span className="font-bold border-b-2 p-2" key={j}>
+                    {j}
                   </span>
-                  {row.map((col, j) => {
-                    return (
-                      <span key={j} className="p-2">
-                        {col}
-                      </span>
-                    );
-                  })}
-                </>
-              );
-            })}
+                );
+              })}
+              {distanceGraph.map((row, i) => {
+                return (
+                  <>
+                    <span className="font-bold border-r-2 p-2" key={i}>
+                      {i}
+                    </span>
+                    {row.map((col, j) => {
+                      return (
+                        <span key={j} className="p-2">
+                          {col}
+                        </span>
+                      );
+                    })}
+                  </>
+                );
+              })}
+            </div>
+            <div>
+              <span>Legend</span>
+              <ol className="list-disc">
+                <li>0 = Same Origin</li>
+                <li>{`>0 = Distance`}</li>
+              </ol>
+            </div>
           </div>
-          <div>
-            <span>Legend</span>
-            <ol className="list-disc">
-              <li>0 = Same Origin</li>
-              <li>{`>0 = Distance`}</li>
-            </ol>
-          </div>
-        </div>
-        <div className="flex flex-col items-center">
-          <span>Traffic Graph</span>
-          <div className="grid grid-cols-9">
-            <span></span>
-            {trafficGraph.map((col, j) => {
-              return (
-                <span className="font-bold border-b-2 p-2" key={j}>
-                  {j}
-                </span>
-              );
-            })}
-            {trafficGraph.map((row, i) => {
-              return (
-                <>
-                  <span className="font-bold border-r-2 p-2" key={i}>
-                    {i}
+          <div className="flex flex-col items-center">
+            <span className="font-bold">Traffic Graph</span>
+            <div className="grid grid-cols-9">
+              <span></span>
+              {trafficGraph.map((col, j) => {
+                return (
+                  <span className="font-bold border-b-2 p-2" key={j}>
+                    {j}
                   </span>
-                  {row.map((col, j) => {
-                    return (
-                      <span key={j} className="p-2">
-                        {col}
-                      </span>
-                    );
-                  })}
-                </>
-              );
-            })}
-          </div>
-          <div>
-            <span>Legend</span>
-            <ol className="list-disc">
-              <li>-1 = Same Origin</li>
-              <li>0 = No traffic</li>
-              <li>{`>0 = Traffic amount`}</li>
-            </ol>
+                );
+              })}
+              {trafficGraph.map((row, i) => {
+                return (
+                  <>
+                    <span className="font-bold border-r-2 p-2" key={i}>
+                      {i}
+                    </span>
+                    {row.map((col, j) => {
+                      return (
+                        <span key={j} className="p-2">
+                          {col}
+                        </span>
+                      );
+                    })}
+                  </>
+                );
+              })}
+            </div>
+            <div>
+              <span>Legend</span>
+              <ol className="list-disc">
+                <li>-1 = Same Origin</li>
+                <li>0 = No traffic</li>
+                <li>{`>0 = Traffic amount`}</li>
+              </ol>
+            </div>
           </div>
         </div>
         <div className="flex flex-col items-center">
