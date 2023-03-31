@@ -1,6 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import type {
+  Dijkstra,
+  DijkstraCalculationData,
+  NodeInformation,
+  Vehicle,
+} from "./types";
+import VehicleData from "./Vehicle";
 
 // traffic generator:
 // - tick based
@@ -18,39 +25,6 @@ import { useEffect, useState } from "react";
 // on each tick:
 // - vehicle move to next node based on djikstra algorithm on distance and traffic graph
 // - traffic graph update based on vehicle position
-
-type DijkstraCalculationData = {
-  route: number[];
-  totalWeight: number;
-  weights: number[];
-  previous: number[];
-  summary: Array<{
-    node: number;
-    weight: number;
-    previous: number;
-  }>;
-};
-
-type Vehicle = {
-  origin: number;
-  destination: number;
-  position: number;
-  route: number[];
-  weights: number;
-  traveledWeights: number;
-  dijkstraDebug: DijkstraCalculationData;
-};
-
-type NodeInformation = {
-  key: number;
-  name: string;
-  status: "origin" | "destination";
-};
-
-type Dijkstra = (
-  origin: number,
-  destination: number
-) => DijkstraCalculationData;
 
 const TrafficSim = () => {
   const [nodes, setNodes] = useState(8);
@@ -363,53 +337,9 @@ const TrafficSim = () => {
         </div>
         <div className="flex flex-col items-center">
           <span>Vehicles Information</span>
-          <div className="grid grid-cols-4">
+          <div className="grid grid-cols-3">
             {vehicles.map((vehicle, i) => {
-              return (
-                <>
-                  <span key={`${i}-i`} className="border-t-2">
-                    <span className="font-bold">ID</span> #V{i}
-                  </span>
-                  <span key={`${i}-origin`} className="border-t-2">
-                    <span className="font-bold">ORIG</span> {vehicle.origin}
-                  </span>
-                  <span key={`${i}-destination`} className="border-t-2">
-                    <span className="font-bold">DEST</span>{" "}
-                    {vehicle.destination}
-                  </span>
-                  <span key={`${i}-position`} className="border-t-2">
-                    <span className="font-bold">CUR POS</span>{" "}
-                    {vehicle.position}
-                  </span>
-                  <span key={`${i}-path`} className="col-span-3">
-                    <span className="font-bold">PATH</span>{" "}
-                    {vehicle.route.join(" -> ")}
-                  </span>
-                  <span key={`${i}-dist`}>
-                    <span className="font-bold">PROG</span>{" "}
-                    {vehicle.traveledWeights}/{vehicle.weights}
-                  </span>
-                  <span className="col-span-4 font-bold">
-                    DIJKSTRA CALCULATION DATA
-                  </span>
-                  <div className="col-span-4 grid grid-cols-3">
-                    <span>NODE</span>
-                    <span>W FR OG</span>
-                    <span>PREV NODE</span>
-                    {vehicle.dijkstraDebug.summary.map((node, j) => {
-                      return (
-                        <>
-                          <span key={`${i}-node-${j}`}>{node.node}</span>
-                          <span key={`${i}-distance-${j}`}>{node.weight}</span>
-                          <span key={`${i}-previous-${j}`}>
-                            {node.previous}
-                          </span>
-                        </>
-                      );
-                    })}
-                  </div>
-                </>
-              );
+              return <VehicleData key={i} vehicle={vehicle} />;
             })}
           </div>
         </div>
