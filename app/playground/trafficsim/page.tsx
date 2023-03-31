@@ -364,30 +364,30 @@ const TrafficSim = () => {
         <div className="flex flex-col items-center">
           <span>Vehicles Information</span>
           <div className="grid grid-cols-4">
-            <span className="font-bold">ID</span>
-            <span className="font-bold">ORIG</span>
-            <span className="font-bold">DEST</span>
-            <span className="font-bold">CUR POS</span>
             {vehicles.map((vehicle, i) => {
               return (
                 <>
                   <span key={`${i}-i`} className="border-t-2">
-                    #V{i}
+                    <span className="font-bold">ID</span> #V{i}
                   </span>
                   <span key={`${i}-origin`} className="border-t-2">
-                    {vehicle.origin}
+                    <span className="font-bold">ORIG</span> {vehicle.origin}
                   </span>
                   <span key={`${i}-destination`} className="border-t-2">
+                    <span className="font-bold">DEST</span>{" "}
                     {vehicle.destination}
                   </span>
                   <span key={`${i}-position`} className="border-t-2">
+                    <span className="font-bold">CUR POS</span>{" "}
                     {vehicle.position}
                   </span>
                   <span key={`${i}-path`} className="col-span-3">
-                    PATH: {vehicle.route.join(" -> ")}
+                    <span className="font-bold">PATH</span>{" "}
+                    {vehicle.route.join(" -> ")}
                   </span>
                   <span key={`${i}-dist`}>
-                    PROG: {vehicle.traveledWeights}/{vehicle.weights}
+                    <span className="font-bold">PROG</span>{" "}
+                    {vehicle.traveledWeights}/{vehicle.weights}
                   </span>
                   <span className="col-span-4 font-bold">
                     DIJKSTRA CALCULATION DATA
