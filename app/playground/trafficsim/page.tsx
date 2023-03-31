@@ -26,7 +26,7 @@ type DijkstraCalculationData = {
   previous: number[];
   summary: Array<{
     node: number;
-    distance: number;
+    weight: number;
     previous: number;
   }>;
 };
@@ -166,19 +166,19 @@ const TrafficSim = () => {
   }, [nodeInformation]);
 
   const calculateDijkstra: Dijkstra = (origin, destination) => {
-    const distance = new Array(nodes).fill(Infinity);
+    const weight = new Array(nodes).fill(Infinity);
     const previous = new Array(nodes).fill(null);
     const visited = new Array(nodes).fill(false);
-    distance[origin] = 0;
+    weight[origin] = 0;
 
-    const getClosestNode = (distance: number[], visited: boolean[]) => {
+    const getClosestNode = (weight: number[], visited: boolean[]) => {
       let closestNode = null;
-      let closestDistance = Infinity;
+      let smallestWeight = Infinity;
 
       for (let i = 0; i < nodes; i++) {
-        if (distance[i] < closestDistance && !visited[i]) {
+        if (weight[i] < smallestWeight && !visited[i]) {
           closestNode = i;
-          closestDistance = distance[i];
+          smallestWeight = weight[i];
         }
       }
 
@@ -203,19 +203,19 @@ const TrafficSim = () => {
       for (let i = 0; i < nodes; i++) {
         summary.push({
           node: i,
-          distance: distance[i],
+          weight: weight[i],
           previous: previous[i],
         });
       }
 
       // sort by distance
-      summary.sort((a, b) => a.distance - b.distance);
+      summary.sort((a, b) => a.weight - b.weight);
 
       return summary;
     };
 
     for (let i = 0; i < nodes; i++) {
-      const closestNode = getClosestNode(distance, visited);
+      const closestNode = getClosestNode(weight, visited);
 
       if (closestNode === null) {
         break;
@@ -225,13 +225,13 @@ const TrafficSim = () => {
 
       for (let j = 0; j < nodes; j++) {
         if (distanceGraph[closestNode][j] !== 0) {
-          const newDistance =
-            distance[closestNode] +
+          const newWeight =
+            weight[closestNode] +
             distanceGraph[closestNode][j] +
             trafficGraph[closestNode][j];
 
-          if (newDistance < distance[j]) {
-            distance[j] = newDistance;
+          if (newWeight < weight[j]) {
+            weight[j] = newWeight;
             previous[j] = closestNode;
           }
         }
@@ -248,8 +248,8 @@ const TrafficSim = () => {
     return {
       route,
       previous,
-      totalWeight: distance[destination],
-      weights: distance,
+      totalWeight: weight[destination],
+      weights: weight,
       summary,
     };
   };
@@ -400,9 +400,7 @@ const TrafficSim = () => {
                       return (
                         <>
                           <span key={`${i}-node-${j}`}>{node.node}</span>
-                          <span key={`${i}-distance-${j}`}>
-                            {node.distance}
-                          </span>
+                          <span key={`${i}-distance-${j}`}>{node.weight}</span>
                           <span key={`${i}-previous-${j}`}>
                             {node.previous}
                           </span>
