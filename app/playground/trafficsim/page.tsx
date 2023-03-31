@@ -32,7 +32,7 @@ type NodeInformation = {
   status: "origin" | "destination";
 };
 
-type Djikstra = (origin: number, destination: number) => number[];
+type Dijkstra = (origin: number, destination: number) => number[];
 
 const TrafficSim = () => {
   const [nodes, setNodes] = useState(8);
@@ -44,14 +44,25 @@ const TrafficSim = () => {
   const [isSimulationActive, setIsSimulationActive] = useState(false);
 
   const initDistanceGraph = (nodes: number) => {
-    // fill graph with values between 0 and 10
-    const graphArray = Array.from({ length: nodes }, () =>
-      Array.from({ length: nodes }, () => Math.floor(Math.random() * 10))
-    );
+    // generate weighted graph with values between 0 and 10
+    const graphArray = new Array(nodes)
+      .fill(1)
+      .map(() =>
+        new Array(nodes).fill(0).map(() => Math.floor(Math.random() * 10))
+      );
 
     // set diagonal to 0
     for (let i = 0; i < nodes; i++) {
       graphArray[i][i] = 0;
+    }
+
+    // make graph undirected
+    for (let i = 0; i < nodes; i++) {
+      for (let j = 0; j < nodes; j++) {
+        if (graphArray[i][j] !== 0) {
+          graphArray[j][i] = graphArray[i][j];
+        }
+      }
     }
 
     setDistanceGraph(graphArray);
@@ -108,12 +119,13 @@ const TrafficSim = () => {
         destinationNodes[Math.floor(Math.random() * destinationNodes.length)]
           .key;
       const position = origin;
+      const path = calculateDijkstra(origin, destination);
 
       return {
         origin,
         destination,
         position,
-        path: [],
+        path,
       };
     });
 
@@ -131,6 +143,68 @@ const TrafficSim = () => {
       initVehicles(10);
     }
   }, [nodeInformation]);
+
+  const calculateDijkstra: Dijkstra = (origin, destination) => {
+    const distance = new Array(nodes).fill(Infinity);
+    const previous = new Array(nodes).fill(null);
+    const visited = new Array(nodes).fill(false);
+
+    const getClosestNode = (distance: number[], visited: boolean[]) => {
+      let closestNode = null;
+      let closestDistance = Infinity;
+
+      for (let i = 0; i < nodes; i++) {
+        if (distance[i] < closestDistance && !visited[i]) {
+          closestNode = i;
+          closestDistance = distance[i];
+        }
+      }
+
+      return closestNode;
+    };
+
+    const getPath = (destination: number, previous: number[]) => {
+      const path = [];
+      let current = destination;
+
+      while (current !== null) {
+        path.push(current);
+        current = previous[current];
+      }
+
+      return path.reverse();
+    };
+
+    distance[origin] = 0;
+
+    for (let i = 0; i < nodes; i++) {
+      const closestNode = getClosestNode(distance, visited);
+
+      if (closestNode === null) {
+        break;
+      }
+
+      visited[closestNode] = true;
+
+      for (let j = 0; j < nodes; j++) {
+        if (distanceGraph[closestNode][j] !== 0) {
+          const newDistance =
+            distance[closestNode] +
+            distanceGraph[closestNode][j] +
+            trafficGraph[closestNode][j];
+
+          if (newDistance < distance[j]) {
+            distance[j] = newDistance;
+            previous[j] = closestNode;
+          }
+        }
+      }
+    }
+
+    const path = getPath(destination, previous);
+
+    return path;
+  };
 
   useEffect(() => {
     if (isSimulationActive) {
@@ -253,7 +327,7 @@ const TrafficSim = () => {
                   <span key={`${i}-origin`}>{vehicle.origin}</span>
                   <span key={`${i}-destination`}>{vehicle.destination}</span>
                   <span key={`${i}-position`}>{vehicle.position}</span>
-                  <span key={`${i}-path`} className="col-span-4">
+                  <span key={`${i}-path`} className="col-span-4 border-b-2">
                     PATH: {vehicle.path}
                   </span>
                 </>
