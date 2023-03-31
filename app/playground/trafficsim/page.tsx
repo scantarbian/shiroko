@@ -339,7 +339,7 @@ const TrafficSim = () => {
           <span>Vehicles Information</span>
           <div className="grid grid-cols-3">
             {vehicles.map((vehicle, i) => {
-              return <VehicleData key={i} vehicle={vehicle} />;
+              return <VehicleData key={i} vehicle={vehicle} id={i} />;
             })}
           </div>
         </div>
