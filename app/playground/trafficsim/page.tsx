@@ -135,7 +135,7 @@ const TrafficSim = () => {
 
   useEffect(() => {
     if (nodeInformation.length > 0) {
-      initVehicles(10);
+      initVehicles(12);
     }
   }, [nodeInformation]);
 
