@@ -19,11 +19,26 @@ import { useEffect, useState } from "react";
 // - vehicle move to next node based on djikstra algorithm on distance and traffic graph
 // - traffic graph update based on vehicle position
 
+type DijkstraCalculationData = {
+  route: number[];
+  totalWeight: number;
+  weights: number[];
+  previous: number[];
+  summary: Array<{
+    node: number;
+    distance: number;
+    previous: number;
+  }>;
+};
+
 type Vehicle = {
   origin: number;
   destination: number;
   position: number;
-  path: number[];
+  route: number[];
+  weights: number;
+  traveledWeights: number;
+  dijkstraDebug: DijkstraCalculationData;
 };
 
 type NodeInformation = {
@@ -32,7 +47,10 @@ type NodeInformation = {
   status: "origin" | "destination";
 };
 
-type Dijkstra = (origin: number, destination: number) => number[];
+type Dijkstra = (
+  origin: number,
+  destination: number
+) => DijkstraCalculationData;
 
 const TrafficSim = () => {
   const [nodes, setNodes] = useState(8);
@@ -119,13 +137,16 @@ const TrafficSim = () => {
         destinationNodes[Math.floor(Math.random() * destinationNodes.length)]
           .key;
       const position = origin;
-      const path = calculateDijkstra(origin, destination);
+      const dijkstraData = calculateDijkstra(origin, destination);
 
       return {
         origin,
         destination,
         position,
-        path,
+        route: dijkstraData.route,
+        traveledWeights: 0,
+        weights: dijkstraData.totalWeight,
+        dijkstraDebug: dijkstraData,
       };
     });
 
@@ -148,6 +169,7 @@ const TrafficSim = () => {
     const distance = new Array(nodes).fill(Infinity);
     const previous = new Array(nodes).fill(null);
     const visited = new Array(nodes).fill(false);
+    distance[origin] = 0;
 
     const getClosestNode = (distance: number[], visited: boolean[]) => {
       let closestNode = null;
@@ -175,7 +197,22 @@ const TrafficSim = () => {
       return path.reverse();
     };
 
-    distance[origin] = 0;
+    const generateSummary: () => DijkstraCalculationData["summary"] = () => {
+      const summary: DijkstraCalculationData["summary"] = [];
+
+      for (let i = 0; i < nodes; i++) {
+        summary.push({
+          node: i,
+          distance: distance[i],
+          previous: previous[i],
+        });
+      }
+
+      // sort by distance
+      summary.sort((a, b) => a.distance - b.distance);
+
+      return summary;
+    };
 
     for (let i = 0; i < nodes; i++) {
       const closestNode = getClosestNode(distance, visited);
@@ -201,9 +238,20 @@ const TrafficSim = () => {
       }
     }
 
-    const path = getPath(destination, previous);
+    const route: DijkstraCalculationData["route"] = getPath(
+      destination,
+      previous
+    );
 
-    return path;
+    const summary: DijkstraCalculationData["summary"] = generateSummary();
+
+    return {
+      route,
+      previous,
+      totalWeight: distance[destination],
+      weights: distance,
+      summary,
+    };
   };
 
   useEffect(() => {
@@ -323,13 +371,45 @@ const TrafficSim = () => {
             {vehicles.map((vehicle, i) => {
               return (
                 <>
-                  <span key={`${i}-i`}>#V{i}</span>
-                  <span key={`${i}-origin`}>{vehicle.origin}</span>
-                  <span key={`${i}-destination`}>{vehicle.destination}</span>
-                  <span key={`${i}-position`}>{vehicle.position}</span>
-                  <span key={`${i}-path`} className="col-span-4 border-b-2">
-                    PATH: {vehicle.path}
+                  <span key={`${i}-i`} className="border-t-2">
+                    #V{i}
                   </span>
+                  <span key={`${i}-origin`} className="border-t-2">
+                    {vehicle.origin}
+                  </span>
+                  <span key={`${i}-destination`} className="border-t-2">
+                    {vehicle.destination}
+                  </span>
+                  <span key={`${i}-position`} className="border-t-2">
+                    {vehicle.position}
+                  </span>
+                  <span key={`${i}-path`} className="col-span-3">
+                    PATH: {vehicle.route.join(" -> ")}
+                  </span>
+                  <span key={`${i}-dist`}>
+                    PROG: {vehicle.traveledWeights}/{vehicle.weights}
+                  </span>
+                  <span className="col-span-4 font-bold">
+                    DIJKSTRA CALCULATION DATA
+                  </span>
+                  <div className="col-span-4 grid grid-cols-3">
+                    <span>NODE</span>
+                    <span>W FR OG</span>
+                    <span>PREV NODE</span>
+                    {vehicle.dijkstraDebug.summary.map((node, j) => {
+                      return (
+                        <>
+                          <span key={`${i}-node-${j}`}>{node.node}</span>
+                          <span key={`${i}-distance-${j}`}>
+                            {node.distance}
+                          </span>
+                          <span key={`${i}-previous-${j}`}>
+                            {node.previous}
+                          </span>
+                        </>
+                      );
+                    })}
+                  </div>
                 </>
               );
             })}
