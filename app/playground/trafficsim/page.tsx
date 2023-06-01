@@ -264,7 +264,7 @@ const TrafficSim = () => {
       const nextNode = route[traveledNodes + 1];
       const nextNodeWeight = distanceGraph[position][nextNode];
 
-      if (traveledWeights < nextNodeWeight) {
+      if (traveledWeights + 1 < nextNodeWeight) {
         // Continue moving to the next node
         return {
           ...vehicle,
@@ -272,7 +272,7 @@ const TrafficSim = () => {
           totalTraveledWeights: totalTraveledWeights + 1,
         };
       } else {
-        // Arrived at the next node
+        // Arriving at the next node
         console.log(`${id} current node`, nodeInformation[position].name);
         console.log(`${id} next node`, nodeInformation[nextNode].name);
         console.log(
@@ -290,7 +290,7 @@ const TrafficSim = () => {
       }
     });
 
-    setVehicles(() => newVehicles);
+    setVehicles(newVehicles);
   };
 
   useEffect(() => {
