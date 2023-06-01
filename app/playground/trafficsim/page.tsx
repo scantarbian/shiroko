@@ -290,7 +290,7 @@ const TrafficSim = () => {
       }
     });
 
-    setVehicles(newVehicles);
+    setVehicles(() => newVehicles);
   };
 
   useEffect(() => {
@@ -307,7 +307,7 @@ const TrafficSim = () => {
 
       return () => clearInterval(interval);
     }
-  }, [isSimulationActive, tick]);
+  }, [isSimulationActive, updateVehicles]);
 
   const toggleSimulation = () => {
     setIsSimulationActive(!isSimulationActive);
