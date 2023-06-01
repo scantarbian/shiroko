@@ -269,9 +269,12 @@ const TrafficSim = () => {
       // handle reaching destination
       if (position === destination) {
         // console.log(`${id} reached destination`);
-        return {
-          ...vehicle,
-        };
+        // regenerate/reassign vehicle with new destination
+        const randomDestination =
+          nodeInformation[Math.floor(Math.random() * nodeInformation.length)]
+            .key;
+
+        return generateVehicle(vehicle.destination, randomDestination);
       }
 
       // move vehicle to next node based on weight
