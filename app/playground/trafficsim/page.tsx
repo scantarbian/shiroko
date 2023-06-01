@@ -131,11 +131,15 @@ const TrafficSim = () => {
         totalTraveledWeights: 0,
         traveledNodes: 0,
         weights: dijkstraData.totalWeight,
+        justEntered: true,
         dijkstraDebug: dijkstraData,
       };
     });
 
     setVehicles(vehicleArray);
+
+    // load initial traffic data
+    updateTraffic(vehicleArray);
   };
 
   useEffect(() => {
@@ -271,6 +275,7 @@ const TrafficSim = () => {
           ...vehicle,
           traveledWeights: traveledWeights + 1,
           totalTraveledWeights: totalTraveledWeights + 1,
+          justEntered: false,
         };
       } else {
         // Arriving at the next node
@@ -288,6 +293,7 @@ const TrafficSim = () => {
           traveledNodes: traveledNodes + 1,
           traveledWeights: 0,
           totalTraveledWeights: totalTraveledWeights + 1,
+          justEntered: true,
         };
       }
     });
@@ -304,20 +310,20 @@ const TrafficSim = () => {
     const newTrafficGraph = [...trafficGraph]; // copy the existing traffic graph
 
     vehiclesData.forEach((vehicle) => {
-      const { position, previousPosition, route, traveledNodes } = vehicle;
+      const { position, previousPosition, route, traveledNodes, justEntered } =
+        vehicle;
       const nextPosition = route[traveledNodes + 1];
 
-      // If the vehicle is not at the end of its route, increase traffic towards the next node
-      if (nextPosition !== undefined) {
-        newTrafficGraph[position][nextPosition] += 1;
-      }
-
-      // If the vehicle has a previous position and it's different from the current one,
-      // decrease the traffic from the previous node
+      // If the vehicle has moved from its previous position, decrease the traffic from the previous node
       if (previousPosition !== null && previousPosition !== position) {
         if (newTrafficGraph[previousPosition][position] > 0) {
           newTrafficGraph[previousPosition][position] -= 1;
         }
+      }
+
+      // If the vehicle is not at the end of its route and it just entered a new route segment, increase traffic
+      if (nextPosition !== undefined && justEntered) {
+        newTrafficGraph[position][nextPosition] += 1;
       }
     });
 
@@ -328,8 +334,6 @@ const TrafficSim = () => {
     if (isSimulationActive) {
       const interval = setInterval(() => {
         setTick((tick) => tick + 1);
-
-        console.log("tick", tick);
 
         // move vehicles
         updateVehicles();
@@ -434,7 +438,7 @@ const TrafficSim = () => {
                           style={{
                             backgroundColor: `${getHeatmapColor(
                               col,
-                              VEHICLES
+                              MAX_WEIGHT
                             )}`,
                           }}
                         >

@@ -8,6 +8,8 @@ export type Vehicle = {
   traveledWeights: number;
   totalTraveledWeights: number;
   traveledNodes: number;
+  // just entered a route segment
+  justEntered: boolean;
   dijkstraDebug: DijkstraCalculationData;
 };
 
