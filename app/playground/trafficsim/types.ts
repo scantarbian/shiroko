@@ -5,6 +5,8 @@ export type Vehicle = {
   route: number[];
   weights: number;
   traveledWeights: number;
+  totalTraveledWeights: number;
+  traveledNodes: number;
   dijkstraDebug: DijkstraCalculationData;
 };
 
@@ -30,3 +32,4 @@ export type Dijkstra = (
   origin: number,
   destination: number
 ) => DijkstraCalculationData;
+

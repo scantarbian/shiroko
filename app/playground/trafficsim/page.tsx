@@ -28,6 +28,7 @@ import VehicleData from "./Vehicle";
 
 // constants
 const NODES = 8;
+const VEHICLES = 2;
 const MAX_WEIGHT = 10;
 
 const TrafficSim = () => {
@@ -56,7 +57,7 @@ const TrafficSim = () => {
 
     // make graph undirected
     for (let i = 0; i < nodes; i++) {
-      for (let j = 0; j < nodes; j++) {
+      for (let j = i; j < nodes; j++) {
         if (graphArray[i][j] !== 0) {
           graphArray[j][i] = graphArray[i][j];
         }
@@ -126,6 +127,8 @@ const TrafficSim = () => {
         position,
         route: dijkstraData.route,
         traveledWeights: 0,
+        totalTraveledWeights: 0,
+        traveledNodes: 0,
         weights: dijkstraData.totalWeight,
         dijkstraDebug: dijkstraData,
       };
@@ -136,6 +139,7 @@ const TrafficSim = () => {
 
   useEffect(() => {
     Promise.all([
+      setTick(0),
       initNodeInformation(nodes),
       initDistanceGraph(nodes),
       initTrafficGraph(nodes),
@@ -144,7 +148,7 @@ const TrafficSim = () => {
 
   useEffect(() => {
     if (nodeInformation.length > 0) {
-      initVehicles(12);
+      initVehicles(VEHICLES);
     }
   }, [nodeInformation]);
 
@@ -238,20 +242,52 @@ const TrafficSim = () => {
   };
 
   const updateVehicles = () => {
-    const newVehicles = vehicles.map((vehicle) => {
-      const { position, route, traveledWeights, weights } = vehicle;
+    const newVehicles = vehicles.map((vehicle, id) => {
+      const {
+        position,
+        route,
+        traveledWeights,
+        destination,
+        traveledNodes,
+        totalTraveledWeights,
+      } = vehicle;
 
-      // stop if vehicle has reached destination
-      if (traveledWeights === weights) {
-        return vehicle;
+      // handle reaching destination
+      if (position === destination) {
+        console.log(`${id} reached destination`);
+        return {
+          ...vehicle,
+        };
       }
 
       // move vehicle to next node based on weight
+      const nextNode = route[traveledNodes + 1];
+      const nextNodeWeight = distanceGraph[position][nextNode];
 
-      return {
-        ...vehicle,
-        traveledWeights: traveledWeights + 1,
-      };
+      if (traveledWeights < nextNodeWeight) {
+        // Continue moving to the next node
+        return {
+          ...vehicle,
+          traveledWeights: traveledWeights + 1,
+          totalTraveledWeights: totalTraveledWeights + 1,
+        };
+      } else {
+        // Arrived at the next node
+        console.log(`${id} current node`, nodeInformation[position].name);
+        console.log(`${id} next node`, nodeInformation[nextNode].name);
+        console.log(
+          `${id} progress to next node`,
+          `${traveledWeights + 1}/${nextNodeWeight}`
+        );
+
+        return {
+          ...vehicle,
+          position: nextNode,
+          traveledNodes: traveledNodes + 1,
+          traveledWeights: 0,
+          totalTraveledWeights: totalTraveledWeights + 1,
+        };
+      }
     });
 
     setVehicles(newVehicles);
@@ -262,10 +298,12 @@ const TrafficSim = () => {
       const interval = setInterval(() => {
         setTick((tick) => tick + 1);
 
+        console.log("tick", tick);
+
         // move vehicles
         updateVehicles();
         // update traffic graph
-      }, 1000);
+      }, 3000);
 
       return () => clearInterval(interval);
     }

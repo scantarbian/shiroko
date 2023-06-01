@@ -37,7 +37,7 @@ const VehicleData = ({ vehicle, id, nodeInformation }: Props) => {
       </span>
       <span key={`${id}-dist`}>
         <span className="font-bold">PROG</span> {vehicle.traveledWeights}/
-        {vehicle.weights}
+        {vehicle.totalTraveledWeights}/{vehicle.weights}
       </span>
       <button
         onClick={() => {
