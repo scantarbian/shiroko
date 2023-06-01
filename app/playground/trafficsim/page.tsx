@@ -228,18 +228,32 @@ const TrafficSim = () => {
     };
   };
 
+  const updateVehicles = () => {
+    const newVehicles = vehicles.map((vehicle) => {
+      const { position, route, traveledWeights, weights } = vehicle;
+
+      return {
+        ...vehicle,
+        traveledWeights: traveledWeights + 1,
+      };
+    });
+
+    setVehicles(newVehicles);
+  };
+
   useEffect(() => {
     if (isSimulationActive) {
       const interval = setInterval(() => {
         setTick((tick) => tick + 1);
 
         // move vehicles
+        updateVehicles();
         // update traffic graph
       }, 1000);
 
       return () => clearInterval(interval);
     }
-  }, [isSimulationActive]);
+  }, [isSimulationActive, tick]);
 
   const toggleSimulation = () => {
     setIsSimulationActive(!isSimulationActive);
