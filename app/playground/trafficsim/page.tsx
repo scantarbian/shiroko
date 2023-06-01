@@ -26,8 +26,12 @@ import VehicleData from "./Vehicle";
 // - vehicle move to next node based on djikstra algorithm on distance and traffic graph
 // - traffic graph update based on vehicle position
 
+// constants
+const NODES = 8;
+const MAX_WEIGHT = 10;
+
 const TrafficSim = () => {
-  const [nodes, setNodes] = useState(8);
+  const [nodes, setNodes] = useState(NODES);
   const [distanceGraph, setDistanceGraph] = useState<number[][]>([[]]);
   const [trafficGraph, setTrafficGraph] = useState<number[][]>([[]]);
   const [nodeInformation, setNodeInformation] = useState<NodeInformation[]>([]);
@@ -36,11 +40,13 @@ const TrafficSim = () => {
   const [isSimulationActive, setIsSimulationActive] = useState(false);
 
   const initDistanceGraph = (nodes: number) => {
-    // generate weighted graph with values between 0 and 10
+    // generate weighted graph with values between 0 and MAX_WEIGHT
     const graphArray = new Array(nodes)
       .fill(1)
       .map(() =>
-        new Array(nodes).fill(0).map(() => Math.floor(Math.random() * 10))
+        new Array(nodes)
+          .fill(0)
+          .map(() => Math.floor(Math.random() * MAX_WEIGHT))
       );
 
     // set diagonal to 0
@@ -269,6 +275,18 @@ const TrafficSim = () => {
     setIsSimulationActive(!isSimulationActive);
   };
 
+  function getHeatmapColor(weight: number) {
+    // Normalize the weight to range 0 - 1
+    let normalizedWeight = weight / MAX_WEIGHT;
+
+    // Calculate the red and green components
+    let red = Math.floor(normalizedWeight * 255);
+    let green = Math.floor((1 - normalizedWeight) * 255);
+
+    // Return the color in CSS rgb format
+    return `rgb(${red}, ${green}, 0)`;
+  }
+
   if (nodeInformation.length === 0) {
     return <div>Loading...</div>;
   }
@@ -296,7 +314,13 @@ const TrafficSim = () => {
                     </span>
                     {row.map((col, j) => {
                       return (
-                        <span key={j} className="p-2">
+                        <span
+                          key={j}
+                          className="p-2 text-black"
+                          style={{
+                            backgroundColor: `${getHeatmapColor(col)}`,
+                          }}
+                        >
                           {col}
                         </span>
                       );
@@ -333,7 +357,13 @@ const TrafficSim = () => {
                     </span>
                     {row.map((col, j) => {
                       return (
-                        <span key={j} className="p-2">
+                        <span
+                          key={j}
+                          className="p-2 text-black"
+                          style={{
+                            backgroundColor: `${getHeatmapColor(col)}`,
+                          }}
+                        >
                           {col}
                         </span>
                       );
