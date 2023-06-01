@@ -54,7 +54,9 @@ const VehicleData = ({ vehicle, id, nodeInformation }: Props) => {
             : "bg-red-500 "
         }`}
       >
-        {vehicle.position === vehicle.destination ? "ARRIVED" : "ON THE WAY"}
+        {vehicle.position === vehicle.destination
+          ? "ARRIVED"
+          : `REACHED ${nodeInformation[vehicle.position].name}`}
       </span>
       <div
         className={`col-span-4 ${

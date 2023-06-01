@@ -255,7 +255,7 @@ const TrafficSim = () => {
 
       // handle reaching destination
       if (position === destination) {
-        console.log(`${id} reached destination`);
+        // console.log(`${id} reached destination`);
         return {
           ...vehicle,
         };
@@ -274,12 +274,12 @@ const TrafficSim = () => {
         };
       } else {
         // Arriving at the next node
-        console.log(`${id} current node`, nodeInformation[position].name);
-        console.log(`${id} next node`, nodeInformation[nextNode].name);
-        console.log(
-          `${id} progress to next node`,
-          `${traveledWeights + 1}/${nextNodeWeight}`
-        );
+        // console.log(`${id} current node`, nodeInformation[position].name);
+        // console.log(`${id} next node`, nodeInformation[nextNode].name);
+        // console.log(
+        //   `${id} progress to next node`,
+        //   `${traveledWeights + 1}/${nextNodeWeight}`
+        // );
 
         return {
           ...vehicle,
@@ -304,15 +304,21 @@ const TrafficSim = () => {
     const newTrafficGraph = [...trafficGraph]; // copy the existing traffic graph
 
     vehiclesData.forEach((vehicle) => {
-      const { position, previousPosition } = vehicle;
+      const { position, previousPosition, route, traveledNodes } = vehicle;
+      const nextPosition = route[traveledNodes + 1];
 
-      if (previousPosition !== null) {
-        // decrease traffic from previous node
-        newTrafficGraph[previousPosition][position] -= 1;
+      // If the vehicle is not at the end of its route, increase traffic towards the next node
+      if (nextPosition !== undefined) {
+        newTrafficGraph[position][nextPosition] += 1;
       }
 
-      // increase traffic to current node
-      newTrafficGraph[previousPosition ?? position][position] += 1;
+      // If the vehicle has a previous position and it's different from the current one,
+      // decrease the traffic from the previous node
+      if (previousPosition !== null && previousPosition !== position) {
+        if (newTrafficGraph[previousPosition][position] > 0) {
+          newTrafficGraph[previousPosition][position] -= 1;
+        }
+      }
     });
 
     setTrafficGraph(newTrafficGraph); // update the traffic graph state
@@ -331,7 +337,7 @@ const TrafficSim = () => {
 
       return () => clearInterval(interval);
     }
-  }, [isSimulationActive, updateVehicles, updateTraffic]);
+  }, [isSimulationActive, updateVehicles]);
 
   const toggleSimulation = () => {
     setIsSimulationActive(!isSimulationActive);
