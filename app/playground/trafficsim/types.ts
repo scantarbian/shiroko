@@ -36,3 +36,5 @@ export type Dijkstra = (
   destination: number
 ) => DijkstraCalculationData;
 
+export type GenerateVehicle = (origin: number, destination: number) => Vehicle;
+

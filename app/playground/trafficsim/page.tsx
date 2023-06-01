@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import type {
   Dijkstra,
   DijkstraCalculationData,
+  GenerateVehicle,
   NodeInformation,
   Vehicle,
 } from "./types";
@@ -118,28 +119,36 @@ const TrafficSim = () => {
       const destination =
         destinationNodes[Math.floor(Math.random() * destinationNodes.length)]
           .key;
-      const position = origin;
-      const dijkstraData = calculateDijkstra(origin, destination);
 
-      return {
-        origin,
-        destination,
-        position,
-        previousPosition: null,
-        route: dijkstraData.route,
-        traveledWeights: 0,
-        totalTraveledWeights: 0,
-        traveledNodes: 0,
-        weights: dijkstraData.totalWeight,
-        justEntered: true,
-        dijkstraDebug: dijkstraData,
-      };
+      return generateVehicle(origin, destination);
     });
 
     setVehicles(vehicleArray);
 
     // load initial traffic data
     updateTraffic(vehicleArray);
+  };
+
+  const generateVehicle: GenerateVehicle = (
+    origin: number,
+    destination: number
+  ) => {
+    const position = origin;
+    const dijkstraData = calculateDijkstra(origin, destination);
+
+    return {
+      origin,
+      destination,
+      position,
+      previousPosition: null,
+      route: dijkstraData.route,
+      traveledWeights: 0,
+      totalTraveledWeights: 0,
+      traveledNodes: 0,
+      weights: dijkstraData.totalWeight,
+      justEntered: true,
+      dijkstraDebug: dijkstraData,
+    };
   };
 
   useEffect(() => {
