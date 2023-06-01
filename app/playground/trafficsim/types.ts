@@ -2,6 +2,7 @@ export type Vehicle = {
   origin: number;
   destination: number;
   position: number;
+  previousPosition: number | null;
   route: number[];
   weights: number;
   traveledWeights: number;

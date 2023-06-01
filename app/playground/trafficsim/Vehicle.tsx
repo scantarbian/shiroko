@@ -47,6 +47,15 @@ const VehicleData = ({ vehicle, id, nodeInformation }: Props) => {
       >
         <span>Show Dijkstra</span>
       </button>
+      <span
+        className={`col-span-2 text-center  font-bold ${
+          vehicle.position === vehicle.destination
+            ? "bg-green-500 text-black"
+            : "bg-red-500 "
+        }`}
+      >
+        {vehicle.position === vehicle.destination ? "ARRIVED" : "ON THE WAY"}
+      </span>
       <div
         className={`col-span-4 ${
           djikstraDataOpen ? "" : "h-0 overflow-hidden"

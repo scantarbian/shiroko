@@ -28,7 +28,7 @@ import VehicleData from "./Vehicle";
 
 // constants
 const NODES = 8;
-const VEHICLES = 2;
+const VEHICLES = 21;
 const MAX_WEIGHT = 10;
 
 const TrafficSim = () => {
@@ -125,6 +125,7 @@ const TrafficSim = () => {
         origin,
         destination,
         position,
+        previousPosition: null,
         route: dijkstraData.route,
         traveledWeights: 0,
         totalTraveledWeights: 0,
@@ -283,6 +284,7 @@ const TrafficSim = () => {
         return {
           ...vehicle,
           position: nextNode,
+          previousPosition: position, // update previous position
           traveledNodes: traveledNodes + 1,
           traveledWeights: 0,
           totalTraveledWeights: totalTraveledWeights + 1,
@@ -291,6 +293,29 @@ const TrafficSim = () => {
     });
 
     setVehicles(newVehicles);
+
+    // update traffic graph
+    updateTraffic(newVehicles);
+  };
+
+  const updateTraffic = (vehiclesData: Vehicle[]) => {
+    // if vehicle is travelling from a node to another, increase the traffic
+    // if vehicle arrived at destination, decrease the traffic
+    const newTrafficGraph = [...trafficGraph]; // copy the existing traffic graph
+
+    vehiclesData.forEach((vehicle) => {
+      const { position, previousPosition } = vehicle;
+
+      if (previousPosition !== null) {
+        // decrease traffic from previous node
+        newTrafficGraph[previousPosition][position] -= 1;
+      }
+
+      // increase traffic to current node
+      newTrafficGraph[previousPosition ?? position][position] += 1;
+    });
+
+    setTrafficGraph(newTrafficGraph); // update the traffic graph state
   };
 
   useEffect(() => {
@@ -302,20 +327,19 @@ const TrafficSim = () => {
 
         // move vehicles
         updateVehicles();
-        // update traffic graph
       }, 3000);
 
       return () => clearInterval(interval);
     }
-  }, [isSimulationActive, updateVehicles]);
+  }, [isSimulationActive, updateVehicles, updateTraffic]);
 
   const toggleSimulation = () => {
     setIsSimulationActive(!isSimulationActive);
   };
 
-  function getHeatmapColor(weight: number) {
+  function getHeatmapColor(weight: number, maxWeight: number) {
     // Normalize the weight to range 0 - 1
-    let normalizedWeight = weight / MAX_WEIGHT;
+    let normalizedWeight = weight / maxWeight;
 
     // Calculate the red and green components
     let red = Math.floor(normalizedWeight * 255);
@@ -356,7 +380,10 @@ const TrafficSim = () => {
                           key={j}
                           className="p-2 text-black"
                           style={{
-                            backgroundColor: `${getHeatmapColor(col)}`,
+                            backgroundColor: `${getHeatmapColor(
+                              col,
+                              MAX_WEIGHT
+                            )}`,
                           }}
                         >
                           {col}
@@ -399,7 +426,10 @@ const TrafficSim = () => {
                           key={j}
                           className="p-2 text-black"
                           style={{
-                            backgroundColor: `${getHeatmapColor(col)}`,
+                            backgroundColor: `${getHeatmapColor(
+                              col,
+                              VEHICLES
+                            )}`,
                           }}
                         >
                           {col}
