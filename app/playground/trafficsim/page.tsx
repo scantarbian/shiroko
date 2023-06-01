@@ -232,6 +232,9 @@ const TrafficSim = () => {
     if (isSimulationActive) {
       const interval = setInterval(() => {
         setTick((tick) => tick + 1);
+
+        // move vehicles
+        // update traffic graph
       }, 1000);
 
       return () => clearInterval(interval);
@@ -360,4 +363,3 @@ const TrafficSim = () => {
 };
 
 export default TrafficSim;
-
