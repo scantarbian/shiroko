@@ -1,12 +1,13 @@
 import { useState } from "react";
-import type { Vehicle } from "./types";
+import type { Vehicle, NodeInformation } from "./types";
 
 type Props = {
   vehicle: Vehicle;
   id: number;
+  nodeInformation: NodeInformation[];
 };
 
-const VehicleData = ({ vehicle, id }: Props) => {
+const VehicleData = ({ vehicle, id, nodeInformation }: Props) => {
   const [djikstraDataOpen, setDjikstraDataOpen] = useState(false);
 
   return (
@@ -15,16 +16,24 @@ const VehicleData = ({ vehicle, id }: Props) => {
         <span className="font-bold">ID</span> #V{id}
       </span>
       <span key={`${id}-origin`}>
-        <span className="font-bold">ORIG</span> {vehicle.origin}
+        <span className="font-bold">ORIG</span>{" "}
+        {nodeInformation[vehicle.origin].name}
       </span>
       <span key={`${id}-destination`}>
-        <span className="font-bold">DEST</span> {vehicle.destination}
+        <span className="font-bold">DEST</span>{" "}
+        {nodeInformation[vehicle.destination].name}
       </span>
       <span key={`${id}-position`}>
-        <span className="font-bold">CUR POS</span> {vehicle.position}
+        <span className="font-bold">CUR POS</span>{" "}
+        {nodeInformation[vehicle.position].name}
       </span>
       <span key={`${id}-path`} className="col-span-3">
-        <span className="font-bold">PATH</span> {vehicle.route.join(" -> ")}
+        <span className="font-bold">PATH</span>{" "}
+        {vehicle.route
+          .map((node) => {
+            return nodeInformation[node].name;
+          })
+          .join(" -> ")}
       </span>
       <span key={`${id}-dist`}>
         <span className="font-bold">PROG</span> {vehicle.traveledWeights}/
@@ -52,9 +61,15 @@ const VehicleData = ({ vehicle, id }: Props) => {
           {vehicle.dijkstraDebug.summary.map((node, j) => {
             return (
               <>
-                <span key={`${id}-node-${j}`}>{node.node}</span>
+                <span key={`${id}-node-${j}`}>
+                  {nodeInformation[node.node].name}
+                </span>
                 <span key={`${id}-distance-${j}`}>{node.weight}</span>
-                <span key={`${id}-previous-${j}`}>{node.previous}</span>
+                <span key={`${id}-previous-${j}`}>
+                  {node.weight === 0
+                    ? "N/A"
+                    : nodeInformation[node.previous].name}
+                </span>
               </>
             );
           })}

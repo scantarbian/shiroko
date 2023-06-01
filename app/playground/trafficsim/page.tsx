@@ -80,6 +80,7 @@ const TrafficSim = () => {
     const nodeInformationArray: NodeInformation[] = Array.from(
       { length: nodes },
       (_, i) => {
+        // if you want to load custom names, load it here
         const name = String.fromCharCode(65 + i);
         const status = Math.random() < originChance ? "origin" : "destination";
 
@@ -128,9 +129,11 @@ const TrafficSim = () => {
   };
 
   useEffect(() => {
-    initDistanceGraph(nodes);
-    initTrafficGraph(nodes);
-    initNodeInformation(nodes);
+    Promise.all([
+      initNodeInformation(nodes),
+      initDistanceGraph(nodes),
+      initTrafficGraph(nodes),
+    ]);
   }, []);
 
   useEffect(() => {
@@ -232,6 +235,13 @@ const TrafficSim = () => {
     const newVehicles = vehicles.map((vehicle) => {
       const { position, route, traveledWeights, weights } = vehicle;
 
+      // stop if vehicle has reached destination
+      if (traveledWeights === weights) {
+        return vehicle;
+      }
+
+      // move vehicle to next node based on weight
+
       return {
         ...vehicle,
         traveledWeights: traveledWeights + 1,
@@ -259,6 +269,10 @@ const TrafficSim = () => {
     setIsSimulationActive(!isSimulationActive);
   };
 
+  if (nodeInformation.length === 0) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <main>
       <div className="flex space-x-4">
@@ -270,7 +284,7 @@ const TrafficSim = () => {
               {distanceGraph.map((col, j) => {
                 return (
                   <span className="font-bold border-b-2 p-2" key={j}>
-                    {j}
+                    {nodeInformation[j].name}
                   </span>
                 );
               })}
@@ -278,7 +292,7 @@ const TrafficSim = () => {
                 return (
                   <>
                     <span className="font-bold border-r-2 p-2" key={i}>
-                      {i}
+                      {nodeInformation[i].name}
                     </span>
                     {row.map((col, j) => {
                       return (
@@ -299,6 +313,7 @@ const TrafficSim = () => {
               </ol>
             </div>
           </div>
+
           <div className="flex flex-col items-center">
             <span className="font-bold">Traffic Graph</span>
             <div className="grid grid-cols-9">
@@ -306,7 +321,7 @@ const TrafficSim = () => {
               {trafficGraph.map((col, j) => {
                 return (
                   <span className="font-bold border-b-2 p-2" key={j}>
-                    {j}
+                    {nodeInformation[j].name}
                   </span>
                 );
               })}
@@ -314,7 +329,7 @@ const TrafficSim = () => {
                 return (
                   <>
                     <span className="font-bold border-r-2 p-2" key={i}>
-                      {i}
+                      {nodeInformation[i].name}
                     </span>
                     {row.map((col, j) => {
                       return (
@@ -358,7 +373,14 @@ const TrafficSim = () => {
           <span>Vehicles Information</span>
           <div className="grid grid-cols-3">
             {vehicles.map((vehicle, i) => {
-              return <VehicleData key={i} vehicle={vehicle} id={i} />;
+              return (
+                <VehicleData
+                  key={i}
+                  vehicle={vehicle}
+                  id={i}
+                  nodeInformation={nodeInformation}
+                />
+              );
             })}
           </div>
         </div>
