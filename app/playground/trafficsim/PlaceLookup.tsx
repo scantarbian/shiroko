@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { Dijkstra, NodeInformation, DijkstraCalculationData } from "./types";
 
@@ -15,11 +15,16 @@ type Props = {
 const PlaceLookup = ({ nodeInformation, calculateDijkstra }: Props) => {
   const [dijkstraData, setDijkstraData] =
     useState<DijkstraCalculationData | null>(null);
+  const [searchSuggestions, setSearchSuggestions] = useState<string[]>([]);
+  const [watching, setWatching] = useState<"origin" | "destination" | null>(
+    null
+  );
 
   const {
     register,
     handleSubmit,
     watch,
+    setValue,
     formState: { errors },
   } = useForm<Inputs>();
   const onSubmit: SubmitHandler<Inputs> = (data) => {
@@ -46,28 +51,75 @@ const PlaceLookup = ({ nodeInformation, calculateDijkstra }: Props) => {
     }
   };
 
-  console.log(watch("origin"));
+  // implement search suggestions
+  // use Knuth-Morris-Pratt (KMA) string matching algorithm
+  useEffect(() => {
+    if (watching !== null) {
+      const target = watch(watching!).toLowerCase();
+
+      const suggestions = nodeInformation
+        .filter((node) => {
+          return node.alias!.toLowerCase().includes(target);
+        })
+        .map((node) => {
+          return node.alias;
+        });
+
+      console.log("target", target);
+      console.log(suggestions);
+
+      // @ts-ignore
+      setSearchSuggestions([...suggestions]);
+    }
+  }, [watch("origin"), watch("destination"), watching]);
 
   return (
     <div className="flex w-full space-x-2">
-      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-y-2">
-        <input
-          {...register("origin", {
-            required: true,
-          })}
-          placeholder="Origin"
-          className="bg-black border border-white p-1"
-        />
-        <input
-          {...register("destination", {
-            required: true,
-          })}
-          placeholder="Destination"
-          className="bg-black border border-white p-1"
-        />
-        <button type="submit" className="border border-white p-1">
-          <span>Calculate</span>
-        </button>
+      <form onSubmit={handleSubmit(onSubmit)} className="flex">
+        <div className="flex flex-col gap-y-2">
+          <input
+            {...register("origin", {
+              required: true,
+            })}
+            placeholder="Origin"
+            className="bg-black border border-white p-1"
+            onClick={() => {
+              setWatching("origin");
+            }}
+          />
+          <input
+            {...register("destination", {
+              required: true,
+            })}
+            placeholder="Destination"
+            className="bg-black border border-white p-1"
+            onClick={() => {
+              setWatching("destination");
+            }}
+          />
+          <button type="submit" className="border border-white p-1">
+            <span>Calculate</span>
+          </button>
+        </div>
+        {searchSuggestions.length > 0 && (
+          <div className="flex flex-col pl-2">
+            <span>Suggestions</span>
+            {searchSuggestions.map((suggestion) => {
+              return (
+                <button
+                  onClick={() => {
+                    setValue(watching!, suggestion);
+                    setSearchSuggestions([]);
+                    setWatching(null);
+                  }}
+                  className="hover:underline text-left"
+                >
+                  {suggestion}
+                </button>
+              );
+            })}
+          </div>
+        )}
       </form>
       {dijkstraData && (
         <div className="flex justify-between w-full">
