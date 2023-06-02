@@ -479,31 +479,38 @@ const TrafficSim = () => {
             </div>
           </div>
         </div>
+
         <div className="flex flex-col items-center">
-          <span>Nodes Information</span>
-          <div className="grid grid-cols-4">
-            <span className="font-bold">ID</span>
-            <span className="font-bold">NAME</span>
-            <span className="font-bold">STATUS</span>
-            <span className="font-bold">ALIAS</span>
-            {nodeInformation.map((node) => {
-              return (
-                <>
-                  <span key={`${node.key}-key`}>{node.key}</span>
-                  <span key={`${node.key}-name`}>{node.name}</span>
-                  <span key={`${node.key}-status`}>{node.status}</span>
-                  <span key={`${node.key}-alias`}>{node.alias}</span>
-                </>
-              );
-            })}
+          <div className="flex w-full">
+            <div className="flex flex-col items-center">
+              <span>Nodes Information</span>
+              <div className="grid grid-cols-4">
+                <span className="font-bold">ID</span>
+                <span className="font-bold">NAME</span>
+                <span className="font-bold">STATUS</span>
+                <span className="font-bold">ALIAS</span>
+                {nodeInformation.map((node) => {
+                  return (
+                    <>
+                      <span key={`${node.key}-key`}>{node.key}</span>
+                      <span key={`${node.key}-name`}>{node.name}</span>
+                      <span key={`${node.key}-status`}>
+                        {node.status.substring(0, 4)}
+                      </span>
+                      <span key={`${node.key}-alias`}>{node.alias}</span>
+                    </>
+                  );
+                })}
+              </div>
+            </div>
+            <div className="flex flex-col items-center">
+              <span>Place Lookup</span>
+              <PlaceLookup
+                nodeInformation={nodeInformation}
+                calculateDijkstra={calculateDijkstra}
+              />
+            </div>
           </div>
-        </div>
-        <div className="flex flex-col items-center">
-          <span>Place Lookup</span>
-          <PlaceLookup
-            nodeInformation={nodeInformation}
-            calculateDijkstra={calculateDijkstra}
-          />
           <span>Vehicles Information</span>
           <div className="grid grid-cols-3">
             {vehicles.map((vehicle, i) => {
