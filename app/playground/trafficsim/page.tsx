@@ -9,6 +9,8 @@ import type {
   Vehicle,
 } from "./types";
 import VehicleData from "./Vehicle";
+import PlaceLookup from "./PlaceLookup";
+import PLACES from "@/_mock/places";
 
 // traffic generator:
 // - tick based
@@ -91,11 +93,14 @@ const TrafficSim = () => {
         // if you want to load custom names, load it here
         const name = String.fromCharCode(65 + i);
         const status = Math.random() < originChance ? "origin" : "destination";
+        // randomly assign alias from PLACES (array of names)
+        const alias = PLACES[Math.floor(Math.random() * PLACES.length)];
 
         return {
           key: i,
           name,
           status,
+          alias,
         };
       }
     );
@@ -298,6 +303,8 @@ const TrafficSim = () => {
         //   `${traveledWeights + 1}/${nextNodeWeight}`
         // );
 
+        // if we want to take into account traffic, recalculate dijkstra here
+
         return {
           ...vehicle,
           position: nextNode,
@@ -474,22 +481,29 @@ const TrafficSim = () => {
         </div>
         <div className="flex flex-col items-center">
           <span>Nodes Information</span>
-          <div className="grid grid-cols-3">
-            <span className="font-bold">NAME</span>
+          <div className="grid grid-cols-4">
             <span className="font-bold">ID</span>
+            <span className="font-bold">NAME</span>
             <span className="font-bold">STATUS</span>
+            <span className="font-bold">ALIAS</span>
             {nodeInformation.map((node) => {
               return (
                 <>
-                  <span key={`${node.key}-name`}>{node.name}</span>
                   <span key={`${node.key}-key`}>{node.key}</span>
+                  <span key={`${node.key}-name`}>{node.name}</span>
                   <span key={`${node.key}-status`}>{node.status}</span>
+                  <span key={`${node.key}-alias`}>{node.alias}</span>
                 </>
               );
             })}
           </div>
         </div>
         <div className="flex flex-col items-center">
+          <span>Place Lookup</span>
+          <PlaceLookup
+            nodeInformation={nodeInformation}
+            calculateDijkstra={calculateDijkstra}
+          />
           <span>Vehicles Information</span>
           <div className="grid grid-cols-3">
             {vehicles.map((vehicle, i) => {

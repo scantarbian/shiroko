@@ -28,6 +28,7 @@ export type DijkstraCalculationData = {
 export type NodeInformation = {
   key: number;
   name: string;
+  alias?: string;
   status: "origin" | "destination";
 };
 

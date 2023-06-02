@@ -48,7 +48,7 @@ const VehicleData = ({ vehicle, id, nodeInformation }: Props) => {
         <span>Show Dijkstra</span>
       </button>
       <span
-        className={`col-span-2 text-center  font-bold ${
+        className={`col-span-2 text-center font-bold ${
           vehicle.position === vehicle.destination
             ? "bg-green-500 text-black"
             : "bg-red-500 "
