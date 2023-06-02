@@ -69,43 +69,41 @@ const PlaceLookup = ({ nodeInformation, calculateDijkstra }: Props) => {
           <span>Calculate</span>
         </button>
       </form>
-      <div>
-        {dijkstraData && (
-          <div className="flex justify-between">
-            <div className="flex flex-col">
-              <span>Result</span>
-              <span>
-                {dijkstraData.route
-                  .map((node) => {
-                    return `${nodeInformation[node].alias} (${nodeInformation[node].name})`;
-                  })
-                  .join(" -> ")}
-              </span>
-              <span>Weights: {dijkstraData.totalWeight}</span>
-            </div>
-            <div className=" grid grid-cols-3">
-              <span>NODE</span>
-              <span>W FR OG</span>
-              <span>PREV NODE</span>
-              {dijkstraData.summary.map((node, j) => {
-                return (
-                  <>
-                    <span key={`node-${j}`}>
-                      {nodeInformation[node.node].name}
-                    </span>
-                    <span key={`distance-${j}`}>{node.weight}</span>
-                    <span key={`previous-${j}`}>
-                      {node.weight === 0
-                        ? "N/A"
-                        : nodeInformation[node.previous].name}
-                    </span>
-                  </>
-                );
-              })}
-            </div>
+      {dijkstraData && (
+        <div className="flex justify-between w-full">
+          <div className="flex flex-col">
+            <span>Result</span>
+            <span>
+              {dijkstraData.route
+                .map((node) => {
+                  return `${nodeInformation[node].alias} (${nodeInformation[node].name})`;
+                })
+                .join(" -> ")}
+            </span>
+            <span>Weights: {dijkstraData.totalWeight}</span>
           </div>
-        )}
-      </div>
+          <div className="grid grid-cols-3">
+            <span>NODE</span>
+            <span>W FR OG</span>
+            <span>PREV NODE</span>
+            {dijkstraData.summary.map((node, j) => {
+              return (
+                <>
+                  <span key={`node-${j}`}>
+                    {nodeInformation[node.node].name}
+                  </span>
+                  <span key={`distance-${j}`}>{node.weight}</span>
+                  <span key={`previous-${j}`}>
+                    {node.weight === 0
+                      ? "N/A"
+                      : nodeInformation[node.previous].name}
+                  </span>
+                </>
+              );
+            })}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
