@@ -71,7 +71,7 @@ const PlaceLookup = ({ nodeInformation, calculateDijkstra }: Props) => {
         setSearchSuggestions([]);
       }
     }
-  }, [watch("origin"), watch("destination"), watching]);
+  }, [watch, watch("origin"), watch("destination")]);
 
   return (
     <div className="flex w-full space-x-2">
@@ -104,9 +104,10 @@ const PlaceLookup = ({ nodeInformation, calculateDijkstra }: Props) => {
         {searchSuggestions.length > 0 && (
           <div className="flex flex-col pl-2">
             <span>Suggestions</span>
-            {searchSuggestions.map((suggestion) => {
+            {searchSuggestions.map((suggestion, i) => {
               return (
                 <button
+                  key={`suggestion-${i}`}
                   onClick={() => {
                     setValue(watching!, suggestion);
                     setSearchSuggestions([]);
