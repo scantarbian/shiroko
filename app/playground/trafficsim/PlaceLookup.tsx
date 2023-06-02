@@ -52,24 +52,24 @@ const PlaceLookup = ({ nodeInformation, calculateDijkstra }: Props) => {
   };
 
   // implement search suggestions
-  // use Knuth-Morris-Pratt (KMA) string matching algorithm
   useEffect(() => {
     if (watching !== null) {
       const target = watch(watching!).toLowerCase();
 
-      const suggestions = nodeInformation
-        .filter((node) => {
-          return node.alias!.toLowerCase().includes(target);
-        })
-        .map((node) => {
-          return node.alias;
-        });
+      if (target.length > 0) {
+        const suggestions = nodeInformation
+          .filter((node) => {
+            return node.alias!.toLowerCase().includes(target);
+          })
+          .map((node) => {
+            return node.alias;
+          });
 
-      console.log("target", target);
-      console.log(suggestions);
-
-      // @ts-ignore
-      setSearchSuggestions([...suggestions]);
+        // @ts-ignore
+        setSearchSuggestions([...suggestions]);
+      } else {
+        setSearchSuggestions([]);
+      }
     }
   }, [watch("origin"), watch("destination"), watching]);
 
